@@ -48,11 +48,11 @@ Receives synchronized image and depth data to calculate real-world scale.
 
 ### Expected Payload (Form-Data):
 
-> image: The RGB image file (JPEG/PNG).
-> depth_map: The synchronized raw depth matrix from the AR session.
-> focal_length: The intrinsic focal length of the camera (Float).
+* image: The RGB image file (JPEG/PNG).
+* depth_map: The synchronized raw depth matrix from the AR session.
+* focal_length: The intrinsic focal length of the camera (Float).
 
-### Expected Response:
+### Expected Response (JSON):
 
 ```JSON
 {
