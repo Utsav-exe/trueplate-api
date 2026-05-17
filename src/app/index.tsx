@@ -40,36 +40,45 @@ export default function App() {
 
     try {
       const formData = new FormData();
-      
-      const imageResponse = await fetch(imageUri);
-      const imageBlob = await imageResponse.blob();
-      formData.append('image', imageBlob, 'meal.jpg');
-      
-      const dummyBlob = new Blob([''], { type: 'application/octet-stream' });
-      formData.append('depth_map', dummyBlob, 'placeholder.npy');
-      formData.append('camera_distance', cameraDistance); 
+
+      // 1. Pass the real image URI
+      formData.append('image', {
+        uri: imageUri,
+        name: 'meal.jpg',
+        type: 'image/jpeg'
+      });
+
+      // 2. Use the valid imageUri as a placeholder path so the phone doesn't crash.
+      // We keep the name 'placeholder.npy' so the backend knows what it is supposed to be.
+      formData.append('depth_map', {
+        uri: imageUri,
+        name: 'placeholder.npy',
+        type: 'application/octet-stream'
+      });
+
+      formData.append('camera_distance', cameraDistance);
 
       const response = await fetch('https://animesh105-trueplate-api.hf.space/calculate-dimensions', {
         method: 'POST',
-        body: formData, 
+        body: formData,
       });
-      
+
       if (!response.ok) throw new Error(`Server error: ${response.status}`);
-      
+
       const data = await response.json();
-      setDimensions(data.dimensions); 
-      
+      setDimensions(data.dimensions);
+
     } catch (error) {
       console.error("Network Error:", error);
       alert("Scanner offline. Check backend connection.");
     } finally {
-      setIsAnalyzing(false); 
+      setIsAnalyzing(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      
+
       {/* 1. TOP HALF: FULL BLEED MEDIA AREA */}
       <View style={styles.mediaArea}>
         {imageUri ? (
@@ -92,19 +101,19 @@ export default function App() {
         {/* Top left subtle branding */}
         <SafeAreaView style={styles.brandingOverlay}>
           <View style={styles.glassBadge}>
-             <Ionicons name="scan" size={14} color="#06B6D4" />
-             <Text style={styles.brandingText}>TruePlate Engine</Text>
+            <Ionicons name="scan" size={14} color="#06B6D4" />
+            <Text style={styles.brandingText}>TruePlate Engine</Text>
           </View>
         </SafeAreaView>
       </View>
 
       {/* 2. BOTTOM SHEET: OVERLAPPING INTERFACE */}
       <View style={styles.bottomSheet}>
-        
+
         {/* Floating Action Button (Sits right on the border) */}
         <View style={styles.fabContainer}>
-          <TouchableOpacity 
-            style={[styles.fab, isAnalyzing && styles.fabDisabled]} 
+          <TouchableOpacity
+            style={[styles.fab, isAnalyzing && styles.fabDisabled]}
             onPress={imageUri ? calculateDimensions : pickImage}
             activeOpacity={0.8}
             disabled={isAnalyzing}
@@ -118,7 +127,7 @@ export default function App() {
         </View>
 
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.sheetContent}>
-          
+
           {/* Header row in sheet */}
           <View style={styles.sheetHeader}>
             <Text style={styles.sheetTitle}>Volume Metrics</Text>
@@ -140,9 +149,9 @@ export default function App() {
                   <Text style={styles.hudUnit}>cm</Text>
                 </View>
               </View>
-              
+
               <View style={styles.hudDivider} />
-              
+
               <View style={styles.hudBox}>
                 <Text style={styles.hudLabel}>LENGTH</Text>
                 <View style={styles.hudValueRow}>
@@ -173,9 +182,9 @@ export default function App() {
               <Ionicons name="options" size={16} color="#06B6D4" />
               <Text style={styles.calibTitle}>LENS CALIBRATION (CM)</Text>
             </View>
-            
+
             <View style={styles.inputWrapper}>
-              <TextInput 
+              <TextInput
                 style={styles.techInput}
                 keyboardType="numeric"
                 value={cameraDistance}
