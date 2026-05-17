@@ -49,7 +49,7 @@ export default function App() {
       formData.append('depth_map', dummyBlob, 'placeholder.npy');
       formData.append('camera_distance', cameraDistance); 
 
-      const response = await fetch('http://127.0.0.1:8000/calculate-dimensions', {
+      const response = await fetch('https://animesh105-trueplate-api.hf.space/calculate-dimensions', {
         method: 'POST',
         body: formData, 
       });
